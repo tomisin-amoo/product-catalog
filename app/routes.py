@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from .models import User, Product
+from . import db
 
 main = Blueprint('main', __name__)
 
@@ -11,8 +12,8 @@ def home():
 
 @main.route('/products')
 def product_list():
-    products = Product.query.all()
-    return render_template('products.html', products=products)
+    all_products = Product.query.all()
+    return render_template('products.html', products=all_products)
 
 @main.route('/logout')
 @login_required

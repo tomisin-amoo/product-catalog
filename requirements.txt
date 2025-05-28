@@ -1,5 +1,10 @@
-flask
-flask-login
-flask-sqlalchemy
+Flask
+Flask-Login
+Flask-SQLAlchemy
 psycopg2-binary
 python-dotenv
+# …any other runtime deps…
+
+# Dev / testing tools (optional in Docker)
+pytest
+pytest-flask
