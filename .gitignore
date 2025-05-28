@@ -3,3 +3,10 @@ __pycache__/
 *.pyc
 *.db
 .vscode/
+.env
+__pycache__/
+*.pyc
+.env
+.env.*
+*.sqlite3
+instance/

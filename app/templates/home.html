@@ -1,0 +1,36 @@
+<!-- app/templates/home.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Catalog</title>
+</head>
+<body>
+    <h1>Product Catalog</h1>
+
+<form action="{{ url_for('main.search') }}" method="get">
+    <input type="text" name="q" placeholder="Search by name or category">
+    <button type="submit">Search</button>
+</form>
+
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <p><a href="{{ url_for('main.add_product') }}">➕ Add a New Product</a></p>
+  {% endif %}
+
+    {% for product in products %}
+  <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+    <h2>{{ product.name }} - ${{ product.price }}</h2>
+    <p><strong>Category:</strong> {{ product.category }}</p>
+    <p>{{ product.description }}</p>
+
+    {% if current_user.is_authenticated and current_user.is_admin %}
+      <a href="{{ url_for('main.edit_product', product_id=product.id) }}">✏️ Edit</a>
+      <form method="POST" action="{{ url_for('main.delete_product', product_id=product.id) }}" style="display:inline;">
+        <button type="submit" onclick="return confirm('Are you sure you want to delete this product?')">🗑️ Delete</button>
+      </form>
+    {% endif %}
+  </div>
+{% endfor %}
+
+</body>
+</html>

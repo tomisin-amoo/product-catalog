@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results for "{{ query }}"</h1>
+
+    {% if results %}
+        {% for product in results %}
+            <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+                <h2>{{ product.name }} - ${{ product.price }}</h2>
+                <p><strong>Category:</strong> {{ product.category }}</p>
+                <p>{{ product.description }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No products found.</p>
+    {% endif %}
+
+    <a href="{{ url_for('main.home') }}">Back to Home</a>
+</body>
+</html>
