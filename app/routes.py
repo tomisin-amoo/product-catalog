@@ -2,6 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from .models import User, Product
 from . import db
+from werkzeug.utils import secure_filename
+import os
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 main = Blueprint('main', __name__)
 
@@ -34,30 +38,6 @@ def search():
             results.append(product)
 
     return render_template('search_results.html', query=query, results=results)
-
-@main.route('/add', methods=['GET', 'POST'])
-@login_required
-def add_product():
-    if not current_user.is_admin:
-        flash("Only admins can add products.")
-        return redirect(url_for('main.home'))
-
-    if request.method == 'POST':
-        name = request.form.get('name')
-        category = request.form.get('category')
-        price = request.form.get('price')
-        description = request.form.get('description')
-
-        new_product = Product(
-            name=name,
-            category=category,
-            price=float(price),
-            description=description
-        )
-        db.session.add(new_product)
-        db.session.commit()
-        flash('Product added!')
-        return redirect(url_for('main.home'))
     
     # --- EDIT PRODUCT ---
 @main.route('/edit/<int:product_id>', methods=['GET', 'POST'])
@@ -96,5 +76,39 @@ def delete_product(product_id):
     db.session.commit()
     flash("Product deleted successfully.", "info")
     return redirect(url_for('main.home'))
+
+    return render_template('add_product.html')
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@main.route('/add', methods=['GET', 'POST'])
+@login_required
+def add_product():
+    if not current_user.is_admin:
+        return redirect(url_for('main.index'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        category = request.form['category']
+        price = float(request.form['price'])
+        description = request.form['description']
+        image = request.files['image']
+
+        filename = None
+        if image and allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
+        product = Product(
+            name=name,
+            category=category,
+            price=price,
+            description=description,
+            image_filename=filename
+        )
+        db.session.add(product)
+        db.session.commit()
+        return redirect(url_for('main.index'))
 
     return render_template('add_product.html')

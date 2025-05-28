@@ -2,55 +2,43 @@
 {% block title %}Home - Product Catalog{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1>Product Catalog</h1>
+  <h2 class="mb-4">All Products</h2>
 
-  <form class="d-flex" action="{{ url_for('main.search') }}" method="get">
-    <input
-      class="form-control me-2"
-      type="search"
-      name="q"
-      placeholder="Search products..."
-    >
-    <button class="btn btn-outline-success" type="submit">Search</button>
-  </form>
-</div>
+  {% if products %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for product in products %}
+        <div class="col">
+          <div class="card h-100">
+            {% if product.image_filename %}
+              <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}"
+                   class="card-img-top" alt="{{ product.name }}" style="object-fit: cover; height: 200px;">
+            {% else %}
+              <img src="{{ url_for('static', filename='default.jpg') }}"
+                   class="card-img-top" alt="No image" style="object-fit: cover; height: 200px;">
+            {% endif %}
 
-{% if current_user.is_authenticated and current_user.is_admin %}
-  <a class="btn btn-primary mb-3" href="{{ url_for('main.add_product') }}">
-    + Add New Product
-  </a>
-{% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text">
+                <strong>Category:</strong> {{ product.category }}<br>
+                <strong>Price:</strong> ${{ product.price }}<br>
+                {{ product.description }}
+              </p>
+            </div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-  {% for product in products %}
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">{{ product.name }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">${{ product.price }}</h6>
-          <p class="card-text">{{ product.description }}</p>
-          <p><span class="badge bg-secondary">{{ product.category }}</span></p>
-        </div>
-        {% if current_user.is_authenticated and current_user.is_admin %}
-          <div class="card-footer d-flex justify-content-between">
-            <a
-              class="btn btn-sm btn-outline-primary"
-              href="{{ url_for('main.edit_product', product_id=product.id) }}"
-            >Edit</a>
-            <form
-              method="POST"
-              action="{{ url_for('main.delete_product', product_id=product.id) }}"
-              onsubmit="return confirm('Delete this product?');"
-            >
-              <button class="btn btn-sm btn-outline-danger" type="submit">
-                Delete
-              </button>
-            </form>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+              <div class="card-footer d-flex justify-content-between">
+                <a href="{{ url_for('main.edit_product', product_id=product.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                <form action="{{ url_for('main.delete_product', product_id=product.id) }}" method="POST" onsubmit="return confirm('Delete this product?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </div>
+            {% endif %}
           </div>
-        {% endif %}
-      </div>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
+  {% else %}
+    <p>No products available yet.</p>
+  {% endif %}
 {% endblock %}

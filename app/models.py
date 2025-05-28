@@ -26,3 +26,4 @@ class Product(db.Model):
     category = db.Column(db.String(50))
     price = db.Column(db.Float)
     description = db.Column(db.Text)
+    image_filename = db.Column(db.String(120))

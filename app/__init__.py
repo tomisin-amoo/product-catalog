@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -30,5 +31,8 @@ def create_app():
 
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'app/static/uploads')
+    app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB max file size
 
     return app
